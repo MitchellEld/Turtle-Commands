@@ -1,14 +1,12 @@
-from flask import Flask
-from flask import request
+from flask import Flask, request
 
-from twilio.twiml.messaging_response import Body, Message, Redirect, MessagingResponse
+from twilio.twiml.messaging_response import Body, Message, MessagingResponse
 
 app = Flask(__name__)
 
-
 @app.route("/", methods=['POST'])
-def hello():
-    print(request.data)
+def get_message():
+    print(request.form['Body'])
     # parse json to dict
     response = MessagingResponse()
     message = Message()
