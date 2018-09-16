@@ -15,3 +15,7 @@ The __setup__ directory currently contains a file called __verified_numbers__ th
 The __custom-commands__ directory should contain all of the functions for custom commands.
 
 The __command_mapping.py__ file contains a dictionary that should map the custom command name to a function
+
+## Custom Commands
+- aggieprint
+    - Usage: For setup, use <code>aggieprint set-login \<netid> \<password></code> to login and use your credentials. Then, you can print by <code>aggieprint \<filename></code> and your file will be uploaded to the aggieprint server
