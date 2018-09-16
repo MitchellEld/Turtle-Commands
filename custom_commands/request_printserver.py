@@ -1,9 +1,13 @@
 import requests
 import os
 import base64
+from pathlib import Path
 
 print_cred_file = os.path.dirname(os.path.abspath('custom_commands'))+'/custom_commands/aggieprint_creds'
 print('AGGIEPRINT_CRED_FILE:', print_cred_file)
+print_file_path = Path(print_cred_file)
+if not print_file_path.exists():
+    open(print_cred_file, 'a').close()
 
 login_headers = {
     'X-Authorization': 'PHAROS-USER <base64 encoded "netid:pass">', # PHAROS-USER base64encoded(netid:password)
