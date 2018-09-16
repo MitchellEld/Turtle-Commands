@@ -8,6 +8,8 @@ def get_commands(commands_str):
     commands = []
     commands_str = commands_str.replace('~',HOME_PATH)
     bulk_commands = commands_str.split(';')
+    while '' in bulk_commands:
+        bulk_commands.remove('')
     for bulk_command in bulk_commands:
         command = bulk_command.split(' ')
         while '' in command:
