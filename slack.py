@@ -7,8 +7,8 @@ import requests
 url = "http://127.0.0.1:5000"
 
 # Our app's Slack Event Adapter for receiving actions via the Events API
-slack_signing_secret = 'da82529a03ba7e478e3ee2770bfa7dce'
-slack_bot_user_oauth_token = 'xoxb-435732900096-436461570514-afavU32dRQt8aT98iSP2HPQj'
+slack_signing_secret = 'ee27682f369686232b096439eecdb8a2'
+slack_bot_user_oauth_token = 'xoxb-436597440994-437950307830-bsuElvUuyzr5yO3sMJMCVu98'
 
 slack_events_adapter = SlackEventAdapter(slack_signing_secret, "/slack/events")
 
