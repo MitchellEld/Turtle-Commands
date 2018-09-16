@@ -1,5 +1,9 @@
 import requests
+import os
 import base64
+
+print_cred_file = os.path.dirname(os.path.abspath('custom_commands'))+'/custom_commands/aggieprint_creds'
+print('AGGIEPRINT_CRED_FILE:', print_cred_file)
 
 login_headers = {
     'X-Authorization': 'PHAROS-USER <base64 encoded "netid:pass">', # PHAROS-USER base64encoded(netid:password)
@@ -57,7 +61,7 @@ def get_content_type(filename):
     return extension
 
 def set_login(username, password):
-    with open('aggieprint_creds', 'w') as cred_file:
+    with open(print_cred_file, 'w') as cred_file:
         cred_file.write(username+'\n')
         cred_file.write(password)
 
@@ -78,15 +82,16 @@ def parse_flags(flags):
         parsed_flags['u'] = usr
         parsed_flags['p'] = pwd
     else:
-        if len(flags) == 2:
-            with open('aggieprint_creds', 'w') as cred_file:
+        if len(flags) == 1:
+            with open(print_cred_file, 'r') as cred_file:
                 creds = cred_file.read().split('\n')
                 if len(creds) == 2:
                     parsed_flags['u'] = creds[0]
                     parsed_flags['p'] = creds[1]
                 else:
                     return 'You need to set your login credentials'
-            parsed_flags['filename'] = flags[1]
+            # print(flags)
+            parsed_flags['filename'] = flags[0]
         else:
             return 'Invalid number of parameters to print'
     
@@ -96,16 +101,19 @@ def parse_flags(flags):
 def aggieprint(flags):
     # parse flags for login
     flag_values = parse_flags(flags)
-    if len(flags) == 4 and flags[1] == 'set-login' and type(flag_values) != str:
+    if len(flags) == 3 and flags[0] == 'set-login' and type(flag_values) != str:
         return 'Login credentials have been set'
     if type(flag_values) == str:
         return flag_values
 
+    userpass = str(base64.b64encode(bytes('{}:{}'.format(flag_values['u'], flag_values['p']), 'utf-8')), 'utf-8')
     # Set login header
-    login_headers['X-Authorization'] = 'PHAROS-USER {}'.format(base64.b64encode(b'{}:{}'.format(flag_values['u'], flag_values['p'])))
+    login_headers['X-Authorization'] = 'PHAROS-USER {}'.format(userpass)
 
     # Login for auth tokens
     res = requests.get(login_url, params=login_params, headers=login_headers)
+    if res.status_code < 200 and res.status_code >= 300:
+        return 'Authentication did not work'
 
     # Get the cookies from the login response and concatenate the cookies to a single string for the print request header
     complete_cookie_string = ''
@@ -135,7 +143,6 @@ def aggieprint(flags):
 
     # Request file upload
     up_res = requests.post(upload_url, headers=upload_headers, files=upload_file)
-    print(up_res.text)
 
     if up_res.status_code >= 200 and up_res.status_code < 300:
         return 'File should be uploaded'

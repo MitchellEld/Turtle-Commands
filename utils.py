@@ -22,11 +22,12 @@ def execute_commands(commands):
     for command in commands:
         try:
             if command[0] in command_map:
-                command_map[command[0]](command[1:])
+                output += command_map[command[0]](command[1:])
             elif command[0] in python_command_map:
                 python_command_map[command[0]](' '.join(command[1:]))
             else:
                 output += str(sp.check_output(command),'utf-8')+'\n'
-        except:
+        except Exception as e:
             output += '{} command failed\n'.format(command[0])
+            output += repr(e) + '\n'
     return output
