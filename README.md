@@ -6,7 +6,6 @@ Project for HowdyHack 2018
 
 ## Install 
 <code>pip install -r requirements.txt
-
 FLASK_APP=server.py flask run</code>
 
 ## Structure
