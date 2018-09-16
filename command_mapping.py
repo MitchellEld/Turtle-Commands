@@ -3,6 +3,7 @@ import os
 import time
 
 from custom_commands.request_printserver import aggieprint
+from custom_commands.files import find
 
 command_map = {
     'delay': lambda arg: time.sleep(int(arg[0])),
