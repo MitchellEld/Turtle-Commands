@@ -16,10 +16,8 @@ slack_client = SlackClient(slack_bot_user_oauth_token)
 
 @slack_events_adapter.on("message")
 def handle_message(event_data):
-    #print(event_data)
     if "user" in event_data["event"]:
         r = requests.post(url, data = {'Body': event_data['event']['text'], 'Channel': event_data['event']['channel']})
-        slack_client.api_call("chat.postMessage", channel=event_data['event']["channel"], text=r.text)
 
 def responseMessage(responseContent, respChannel):
     slack_client.api_call("chat.postMessage", channel=respChannel, text=responseContent)
