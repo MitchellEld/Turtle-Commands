@@ -2,7 +2,7 @@ from flask import Flask, request
 from utils import get_commands, execute_commands
 from slack import responseMessage
 import os
-import subprocess
+from multiprocessing import Process
 
 app = Flask(__name__)
 
@@ -14,5 +14,7 @@ def get_message():
     commands = get_commands(req_body)
     # If custom command, run function associated with it
     # If not custom command, run the body as normal os command
-    output = subprocess.call(execute_commands(commands), request.form['Channel'])
+    p = Process(target = execute_commands, args = (commands, request.form['Channel']))
+    p.start()
+    p.join()
     return 'ok'
