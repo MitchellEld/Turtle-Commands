@@ -1,7 +1,9 @@
 # This should just contain a dictionary of custom command names mapped to the function from the custom-commands directory
 import os
 import time
+
 from custom_commands.request_printserver import aggieprint
+from custom_commands.files import find
 
 command_map = {
     'delay': lambda arg: time.sleep(int(arg[0])),
