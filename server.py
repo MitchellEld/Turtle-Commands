@@ -14,7 +14,8 @@ def get_message():
     commands = get_commands(req_body)
     # If custom command, run function associated with it
     # If not custom command, run the body as normal os command
-    p = Process(target = execute_commands, args = (commands, request.form['Channel']))
-    p.start()
-    p.join()
+    #p = Process(target = execute_commands, args = (commands, request.form['Channel']))
+    execute_commands(commands, request.form['Channel'])
+    #p.start()
+    #p.join()
     return 'ok'
