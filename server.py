@@ -47,7 +47,7 @@ def get_message():
             if command[0] in command_map:
                 pass
             elif command[0] in python_command_map:
-                output += python_command_map[command[0]](command[1])
+                python_command_map[command[0]](command[1])
             else:
                 output += str(sp.check_output(command),'utf-8')+'\n'
         except:
