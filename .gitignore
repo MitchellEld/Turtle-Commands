@@ -104,3 +104,6 @@ venv.bak/
 .mypy_cache/
 
 /custom_commands/aggieprint_creds
+
+# File for storing some info if you want
+personal_data

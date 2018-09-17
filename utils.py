@@ -1,14 +1,14 @@
 import subprocess as sp
 from pathlib import Path
 from command_mapping import command_map, python_command_map
-from slack import responseMessage
+from messaging_wrappers.slack import responseMessage
 
 HOME_PATH = str(Path.home())
 
 def get_commands(commands_str):
     commands = []
     commands_str = commands_str.replace('~',HOME_PATH)
-    bulk_commands = commands_str.split(';')
+    bulk_commands = commands_str.split('; ')
     while '' in bulk_commands:
         bulk_commands.remove('')
     for bulk_command in bulk_commands:

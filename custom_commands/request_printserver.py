@@ -2,9 +2,10 @@ import requests
 import os
 import base64
 from pathlib import Path
+import html
 
 print_cred_file = os.path.dirname(os.path.abspath('custom_commands'))+'/custom_commands/aggieprint_creds'
-print('AGGIEPRINT_CRED_FILE:', print_cred_file)
+
 print_file_path = Path(print_cred_file)
 if not print_file_path.exists():
     open(print_cred_file, 'a').close()
@@ -65,6 +66,8 @@ def get_content_type(filename):
     return extension
 
 def set_login(username, password):
+    username = str(base64.b64encode(bytes(username, 'utf-8')),'utf-8')
+    password = str(base64.b64encode(bytes(password, 'utf-8')),'utf-8')
     with open(print_cred_file, 'w') as cred_file:
         cred_file.write(username+'\n')
         cred_file.write(password)
@@ -83,15 +86,14 @@ def parse_flags(flags):
         usr = flags[1]
         pwd = flags[2]
         set_login(usr, pwd)
-        parsed_flags['u'] = usr
-        parsed_flags['p'] = pwd
+        return 'Login credentials have been set'
     else:
         if len(flags) == 1:
             with open(print_cred_file, 'r') as cred_file:
                 creds = cred_file.read().split('\n')
                 if len(creds) == 2:
-                    parsed_flags['u'] = creds[0]
-                    parsed_flags['p'] = creds[1]
+                    parsed_flags['u'] = str(base64.b64decode(bytes(creds[0], 'utf-8')), 'utf-8')
+                    parsed_flags['p'] = html.unescape(str(base64.b64decode(bytes(creds[1],'utf-8')), 'utf-8'))
                 else:
                     return 'You need to set your login credentials'
             # print(flags)
@@ -105,12 +107,11 @@ def parse_flags(flags):
 def aggieprint(flags):
     # parse flags for login
     flag_values = parse_flags(flags)
-    if len(flags) == 3 and flags[0] == 'set-login' and type(flag_values) != str:
-        return 'Login credentials have been set'
     if type(flag_values) == str:
         return flag_values
 
     userpass = str(base64.b64encode(bytes('{}:{}'.format(flag_values['u'], flag_values['p']), 'utf-8')), 'utf-8')
+
     # Set login header
     login_headers['X-Authorization'] = 'PHAROS-USER {}'.format(userpass)
 
@@ -151,5 +152,6 @@ def aggieprint(flags):
     if up_res.status_code >= 200 and up_res.status_code < 300:
         return 'File should be uploaded'
     else:
+        print(up_res.text)
         return 'There was some kind of problem uploading'
 
