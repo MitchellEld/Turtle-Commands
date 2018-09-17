@@ -30,5 +30,5 @@ def execute_commands(commands, channel):
                 output += str(sp.check_output(command),'utf-8')+'\n'
         except Exception as e:
             output += '{} command failed\n'.format(command[0])
-            #output += repr(e) + '\n'
+            output += repr(e) + '\n'
     responseMessage(output, channel)

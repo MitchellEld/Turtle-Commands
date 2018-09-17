@@ -147,7 +147,7 @@ def aggieprint(flags):
     if content_type not in ext2type.values():
         return 'No support for {} file type'.format(content_type)
 
-    file = open(flag_values['filename'],'r')
+    file = open(flag_values['filename'],'rb')
     upload_file = {'MetaData': upload_meta, 'content': (flag_values['filename'], file, content_type)} # Add dynamic content-type and filename
 
     # Request file upload
@@ -158,6 +158,5 @@ def aggieprint(flags):
     elif 'authenticated' in up_res.text.lower():
         return 'There seems to have been a problem with authentication'
     else:
-        print(up_res.text)
         return 'There was some kind of problem uploading'
 
