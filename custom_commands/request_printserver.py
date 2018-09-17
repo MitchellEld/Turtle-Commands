@@ -3,6 +3,7 @@ import os
 import base64
 from pathlib import Path
 import html
+import uuid
 
 print_cred_file = os.path.dirname(os.path.abspath('custom_commands'))+'/custom_commands/aggieprint_creds'
 
@@ -27,14 +28,14 @@ login_params = {
     'includecostcenters': 'yes',
     'excudeLocation': 'yes',
     'notRefreshBalance': 'no',
-    '_request': 'b7180777-880e-4aa4-b7c9-87686d24c082',
+    '_request': uuid.uuid4(),
     '_': '1537066069771'
 }
 
-login_url = 'https://aggieprint.tamu.edu/PharosAPI/logon?KeepMeLoggedIn=no&includeprintjobs=no&includedeviceactivity=yes&includeprivileges=yes&includecostcenters=yes&excudeLocation=yes&notRefreshBalance=no&_request=b7180777-880e-4aa4-b7c9-87686d24c082&_=1537066069771'
+login_url = 'https://aggieprint.tamu.edu/PharosAPI/logon'
 
 upload_params = {
-    '_request': '1f464115-133b-4f0c-86df-f16eb8cc11cc'
+    '_request': uuid.uuid4()
 }
 
 upload_headers = {
@@ -43,8 +44,8 @@ upload_headers = {
     'Accept': '*/*',
     'Cookie': ''
 }
-
-upload_url = 'https://aggieprint.tamu.edu/PharosAPI/users/asxktmuIqDH9LBCNzvm_cw2/printjobs?_request=1f464115-133b-4f0c-86df-f16eb8cc11cc'
+# 'https://aggieprint.tamu.edu/PharosAPI/users/asxktmuIqDH9LBCNzvm_cw2/printjobs'
+upload_url = 'https://aggieprint.tamu.edu/PharosAPI'
 
 cookie_names = ['PharosAPI.SignIn.Token', 'PharosAPI.X-PHAROS-USER-TOKEN', 'PharosAPI.X-PHAROS-USER-URI']
 
@@ -120,10 +121,13 @@ def aggieprint(flags):
     if res.status_code < 200 and res.status_code >= 300:
         return 'Authentication did not work'
 
+    user_uri = ''
     # Get the cookies from the login response and concatenate the cookies to a single string for the print request header
     complete_cookie_string = ''
     for cookie_name in cookie_names:
         if cookie_name in res.cookies:
+            if cookie_name == 'PharosAPI.X-PHAROS-USER-URI':
+                user_uri = res.cookies[cookie_name]
             complete_cookie_string += '{}={}; '.format(cookie_name,res.cookies[cookie_name])
 
     for i in range(len(cookie_names)):
@@ -147,10 +151,12 @@ def aggieprint(flags):
     upload_file = {'MetaData': upload_meta, 'content': (flag_values['filename'], file, content_type)} # Add dynamic content-type and filename
 
     # Request file upload
-    up_res = requests.post(upload_url, headers=upload_headers, files=upload_file)
+    up_res = requests.post('{}{}/printjobs'.format(upload_url,user_uri), headers=upload_headers, files=upload_file)
 
     if up_res.status_code >= 200 and up_res.status_code < 300:
         return 'File should be uploaded'
+    elif 'authenticated' in up_res.text.lower():
+        return 'There seems to have been a problem with authentication'
     else:
         print(up_res.text)
         return 'There was some kind of problem uploading'
